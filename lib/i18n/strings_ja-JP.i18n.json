@@ -9,5 +9,8 @@
   "Relays": "リレー",
   "Secretkey": "秘密鍵",
   "SwitchAccount": "アカウント切り替え",
-  "Catories": "カテゴリ"
+  "Catories": "カテゴリ",
+  "GenerateAccount": "アカウント作成",
+  "AnonymousNamePrefix": "noscha",
+  "AnonymousDisplayNamePrefix": "名無しのノス茶民"
 }

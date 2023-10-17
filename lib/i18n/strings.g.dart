@@ -3,9 +3,9 @@
  * Generated file. Do not edit.
  *
  * Locales: 2
- * Strings: 22 (11.0 per locale)
+ * Strings: 28 (14.0 per locale)
  *
- * Built on 2023-10-12 at 09:49 UTC
+ * Built on 2023-10-17 at 08:35 UTC
  */
 
 import 'package:flutter/widgets.dart';
@@ -319,6 +319,9 @@ class _StringsEn {
 	String get Secretkey => 'Secretkey';
 	String get SwitchAccount => 'Switch Account';
 	String get Catories => 'Catories';
+	String get GenerateAccount => 'Generate Account';
+	String get AnonymousNamePrefix => 'noscha';
+	String get AnonymousDisplayNamePrefix => 'Nostcharich';
 }
 
 // Path: <root>
@@ -348,6 +351,9 @@ class _StringsJaJp implements _StringsEn {
 	@override String get Secretkey => '秘密鍵';
 	@override String get SwitchAccount => 'アカウント切り替え';
 	@override String get Catories => 'カテゴリ';
+	@override String get GenerateAccount => 'アカウント作成';
+	@override String get AnonymousNamePrefix => 'noscha';
+	@override String get AnonymousDisplayNamePrefix => '名無しのノス茶民';
 }
 
 /// Flat map(s) containing all translations.
@@ -367,6 +373,9 @@ extension on _StringsEn {
 			'Secretkey': 'Secretkey',
 			'SwitchAccount': 'Switch Account',
 			'Catories': 'Catories',
+			'GenerateAccount': 'Generate Account',
+			'AnonymousNamePrefix': 'noscha',
+			'AnonymousDisplayNamePrefix': 'Nostcharich',
 		};
 	}
 }
@@ -385,6 +394,9 @@ extension on _StringsJaJp {
 			'Secretkey': '秘密鍵',
 			'SwitchAccount': 'アカウント切り替え',
 			'Catories': 'カテゴリ',
+			'GenerateAccount': 'アカウント作成',
+			'AnonymousNamePrefix': 'noscha',
+			'AnonymousDisplayNamePrefix': '名無しのノス茶民',
 		};
 	}
 }

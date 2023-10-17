@@ -9,5 +9,8 @@
   "Relays": "Relays",
   "Secretkey": "Secretkey",
   "SwitchAccount": "Switch Account",
-  "Catories": "Catories"
+  "Catories": "Catories",
+  "GenerateAccount": "Generate Account",
+  "AnonymousNamePrefix": "noscha",
+  "AnonymousDisplayNamePrefix": "Nostcharich"
 }

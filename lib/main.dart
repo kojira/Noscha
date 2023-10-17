@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:my_app/db/db.dart';
+import 'package:provider/provider.dart';
 import 'package:my_app/i18n/strings.g.dart';
+import 'package:my_app/services/nostr/connect.dart';
 import 'views/home_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   LocaleSettings.useDeviceLocale();
-  runApp(const MyApp());
+  final List<String> relays = ['wss://r.kojira.io/'];
+  Connect.sharedInstance.connectRelays(relays);
+  runApp(
+    Provider(
+      create: (context) => AppDatabase(openConnection()),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,8 +27,7 @@ class MyApp extends StatelessWidget {
         title: t.Noscha,
         home: const BottomNavigation(),
         theme: ThemeData(
-            primaryColor:
-                const Color.fromARGB(255, 143, 128, 187), // primaryColorを赤に設定
+            primaryColor: const Color.fromARGB(255, 143, 128, 187),
             appBarTheme:
                 const AppBarTheme(color: Color.fromARGB(255, 143, 128, 187))));
   }
@@ -53,23 +62,22 @@ class _BottomNavigationState extends State<BottomNavigation> {
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(
-                  // color: Theme.of(context).primaryColor,
                   image: DecorationImage(
                 image: AssetImage('assets/images/header_background.png'),
-                fit: BoxFit.cover, // 画像が領域全体にフィットするように指定
+                fit: BoxFit.cover,
               )),
               child: Text(""),
             ),
             ListTile(
               title: Text(t.Bookmarks),
               onTap: () {
-                Navigator.pop(context); // ドロワーを閉じます
+                Navigator.pop(context);
               },
             ),
             ListTile(
               title: Text(t.Settings),
               onTap: () {
-                Navigator.pop(context); // ドロワーを閉じます
+                Navigator.pop(context);
               },
             ),
           ],
