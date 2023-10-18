@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:my_app/i18n/strings.g.dart';
 import 'package:my_app/services/nostr/keys.dart';
 import 'package:my_app/services/nostr/connect.dart';
+import 'package:my_app/services/nostr/channels.dart';
 import 'package:my_app/db/db.dart';
 import 'package:nostr_core_dart/nostr.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final _channelController = StreamController<List<ListRow>>();
+  final _channelController = StreamController<List<iconListItem>>();
 
   @override
   void initState() {
@@ -28,47 +29,19 @@ class _HomeViewState extends State<HomeView> {
     fetchList();
   }
 
-  Future<List<ListRow>> fetchList() async {
-    var channel_list = <ListRow>[];
-    final filters = [
-      Filter(kinds: [42], limit: 100)
-    ];
-
-    void eventCallBack(Event event, String relay) {
-      ChannelMessage message = Nip28.getChannelMessage(event);
-      DateTime dateTime =
-          DateTime.fromMillisecondsSinceEpoch(event.createdAt * 1000);
-      String updatedAt =
-          "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
-
-      void eventCallBackChannel(Event event, String relay) {
-        Channel channel = Nip28.getChannel(event);
-        if (!channel_list.any((e) => e.channelId == channel.channelId)) {
-          channel_list.add(ListRow(
-              channelId: channel.channelId,
-              text: channel.name,
-              subText: channel.about,
-              iconUrl: channel.picture,
-              datetime: updatedAt));
-          _channelController.add(channel_list);
-        }
-      }
-
-      final filters = [
-        Filter(kinds: [40, 41], ids: [message.channelId], limit: 1)
-      ];
-      Connect.sharedInstance.addSubscription(
-        filters,
-        eventCallBack: eventCallBackChannel,
-      );
-    }
-
-    Connect.sharedInstance.addSubscription(
-      filters,
-      eventCallBack: eventCallBack,
-    );
-
-    return channel_list;
+  void fetchList() async {
+    fetchRecentChannelList((channelList) {
+      var iconListItems = channelList.map((channelItem) {
+        return iconListItem(
+          channelId: channelItem.channelId,
+          iconUrl: channelItem.picture,
+          text: channelItem.name,
+          subText: channelItem.about,
+          datetime: channelItem.datetime,
+        );
+      }).toList();
+      _channelController.add(iconListItems);
+    });
   }
 
   @override
@@ -80,16 +53,16 @@ class _HomeViewState extends State<HomeView> {
           child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-              child: StreamBuilder<List<ListRow>>(
+              child: StreamBuilder<List<iconListItem>>(
                   stream: _channelController.stream,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      final list = ListRow(
+                      final list = iconListItem(
                           channelId: "",
                           text: "",
                           subText: "",
                           iconUrl: "",
-                          datetime: "");
+                          datetime: 0);
 
                       return IconListView(lists: [list]);
                     }
