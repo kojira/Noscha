@@ -47,6 +47,8 @@ dependencies:
   synchronized: ^3.1.0
   flutter_linkify: ^6.0.0
   url_launcher: ^6.1.14
+  collection: ^1.17.2
+  mutex: ^3.1.0
 
 dev_dependencies:
   flutter_test:
