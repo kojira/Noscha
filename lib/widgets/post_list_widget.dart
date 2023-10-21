@@ -1,31 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/util/util.dart';
 import 'package:my_app/widgets/image_widget.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class IconListItem {
+class PostListItem {
   final String id;
   final String iconUrl;
+  final String name;
   final String text;
-  final String subText;
+  final String images;
   final int datetime;
 
-  IconListItem(
+  PostListItem(
       {required this.id,
       required this.iconUrl,
+      required this.name,
       required this.text,
-      required this.subText,
+      required this.images,
       required this.datetime});
 }
 
-class IconListView extends StatefulWidget {
-  final List<IconListItem> lists;
+class PostListView extends StatefulWidget {
+  final List<PostListItem> lists;
   final Function(String)? onItemTap;
-  const IconListView({super.key, required this.lists, this.onItemTap});
+  const PostListView({super.key, required this.lists, this.onItemTap});
   @override
-  _IconListViewState createState() => _IconListViewState();
+  _PostListViewState createState() => _PostListViewState();
 }
 
-class _IconListViewState extends State<IconListView> {
+class _PostListViewState extends State<PostListView> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -53,20 +57,29 @@ class _IconListViewState extends State<IconListView> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         SizedBox(
-                            height: 44,
+                            height: 20,
                             width: double.infinity,
                             child: Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text(widget.lists[index].text,
+                                child: Text(widget.lists[index].name,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 22.0)))),
+                                    style: const TextStyle(fontSize: 12.0)))),
                         SizedBox(
-                            height: 32,
                             width: double.infinity,
-                            child: Text(widget.lists[index].subText,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 10.0),
-                                textAlign: TextAlign.right)),
+                            child: Linkify(
+                                onOpen: (link) async {
+                                  if (!await launchUrl(Uri.parse(link.url),
+                                      mode: LaunchMode.externalApplication)) {
+                                    throw Exception(
+                                        'Could not launch ${link.url}');
+                                  }
+                                },
+                                text: widget.lists[index].text,
+                                style: const TextStyle(fontSize: 16.0),
+                                linkStyle: const TextStyle(
+                                    fontSize: 16.0, color: Colors.red),
+                                textAlign: TextAlign.left)),
+                        const SizedBox(height: 4),
                         SizedBox(
                             height: 15,
                             width: double.infinity,

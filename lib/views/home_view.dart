@@ -9,6 +9,7 @@ import 'package:my_app/services/nostr/keys.dart';
 import 'package:my_app/services/nostr/connect.dart';
 import 'package:my_app/services/nostr/channels.dart';
 import 'package:my_app/db/db.dart';
+import 'package:my_app/views/channel_detail_view.dart';
 import 'package:nostr_core_dart/nostr.dart';
 import 'package:provider/provider.dart';
 import 'package:my_app/widgets/icon_list_widget.dart';
@@ -21,7 +22,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final _channelController = StreamController<List<iconListItem>>();
+  final _channelController = StreamController<List<IconListItem>>();
 
   @override
   void initState() {
@@ -32,8 +33,8 @@ class _HomeViewState extends State<HomeView> {
   void fetchList() async {
     fetchRecentChannelList((channelList) {
       var iconListItems = channelList.map((channelItem) {
-        return iconListItem(
-          channelId: channelItem.channelId,
+        return IconListItem(
+          id: channelItem.channelId,
           iconUrl: channelItem.picture,
           text: channelItem.name,
           subText: channelItem.about,
@@ -42,6 +43,16 @@ class _HomeViewState extends State<HomeView> {
       }).toList();
       _channelController.add(iconListItems);
     });
+  }
+
+  void onChannelListItemTap(channelId) {
+    print(channelId);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChannelDetailView(channelId: channelId),
+      ),
+    );
   }
 
   @override
@@ -53,20 +64,22 @@ class _HomeViewState extends State<HomeView> {
           child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-              child: StreamBuilder<List<iconListItem>>(
+              child: StreamBuilder<List<IconListItem>>(
                   stream: _channelController.stream,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      final list = iconListItem(
-                          channelId: "",
+                      final list = IconListItem(
+                          id: "",
                           text: "",
                           subText: "",
                           iconUrl: "",
                           datetime: 0);
 
-                      return IconListView(lists: [list]);
+                      return IconListView(
+                          lists: [list], onItemTap: onChannelListItemTap);
                     }
-                    return IconListView(lists: snapshot.data!);
+                    return IconListView(
+                        lists: snapshot.data!, onItemTap: onChannelListItemTap);
                   }))),
       TextButton(
         onPressed: () async {

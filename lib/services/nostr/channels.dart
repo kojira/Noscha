@@ -61,7 +61,7 @@ void fetchRecentChannelList(RecentChannelListCallBack callback) async {
   var channelList = <ChannelItem>[];
   var reqChannelIdList = <String>[];
   final filters = [
-    Filter(kinds: [42], limit: 100)
+    Filter(kinds: [42], limit: 200)
   ];
 
   void eventCallBack(Event event, String relay) {
@@ -103,7 +103,87 @@ void fetchRecentChannelList(RecentChannelListCallBack callback) async {
   );
 }
 
+class ChannelMessageItem {
+  final String id;
+  final String author;
+  final String content;
+  final Thread thread;
+  final String relays;
+  final int datetime;
 
-// void getChannelList() async {
-//   Filter.fromJson(json);
-// }
+  ChannelMessageItem(
+      {required this.id,
+      required this.author,
+      required this.content,
+      required this.thread,
+      required this.relays,
+      required this.datetime});
+}
+
+typedef RecentChanneMessageCallBack = void Function(
+    List<ChannelMessageItem> channelMessageList);
+
+final channelMessageListLock = Lock();
+
+bool _addOrUpdateChannelMessageItem(
+    List<ChannelMessageItem> list, ChannelMessageItem newItem, String relay) {
+  bool updated = false;
+  ChannelMessageItem? existingItem;
+  try {
+    existingItem = list.firstWhere((item) => item.id == newItem.id);
+  } catch (e) {
+    existingItem = null;
+  }
+
+  if (existingItem != null) {
+    if (!existingItem.relays.split(',').contains(relay)) {
+      var updatedRelays = '${existingItem.relays},$relay';
+      list.remove(existingItem);
+      list.add(ChannelMessageItem(
+        id: existingItem.id,
+        author: existingItem.author,
+        content: existingItem.content,
+        thread: existingItem.thread,
+        relays: updatedRelays,
+        datetime: existingItem.datetime,
+      ));
+      updated = true;
+    }
+  } else {
+    list.add(newItem);
+    updated = true;
+  }
+  return updated;
+}
+
+void fetchRecentChannelMessages(
+    String channelId, RecentChanneMessageCallBack callback) async {
+  var channelMessageList = <ChannelMessageItem>[];
+
+  Future<void> eventCallBack(Event event, String relay) async {
+    ChannelMessage message = Nip28.getChannelMessage(event);
+    final newItem = ChannelMessageItem(
+        id: event.id,
+        author: event.pubkey,
+        content: message.content,
+        thread: message.thread,
+        relays: relay,
+        datetime: event.createdAt);
+    await channelMessageListLock.synchronized(() async {
+      if (_addOrUpdateChannelMessageItem(channelMessageList, newItem, relay)) {
+        channelMessageList.sort((a, b) => a.datetime.compareTo(b.datetime));
+        callback(channelMessageList);
+      }
+    });
+  }
+
+  final filters = [
+    Filter(
+        e: [channelId],
+        kinds: [42],
+        until: DateTime.now().toUtc().millisecondsSinceEpoch * 1000,
+        limit: 100)
+  ];
+
+  Connect.sharedInstance.addSubscription(filters, eventCallBack: eventCallBack);
+}
